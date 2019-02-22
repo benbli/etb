@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css?family=Cousine');
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:700i,700');
+
+:root {
+  --color-primary: #5d39f3;
+  --color-bg_darker: #141729;
+  --color-bg_dark: #1d2033;
+  --color-white: #ffffff;
+  --color-link_dark: var(--color-primary);
+  --color-link_light: #ffffff;
+  --font-size: 1.6rem;
+  --base-big: 62.5%;
+}
+
 html {
   box-sizing: border-box;
   font-size: 52.5%;
@@ -13,38 +25,34 @@ html {
 
 body {
   margin: 0;
-  /* color: rgba(0, 0, 0, 0.8); */
-  color: #25282b;
+  color: var(--color-white);
+  background: var(--color-bg_darker);
   font-family: 'Cousine', monospace;
-  font-size: 1.6rem;
+  font-size: var(--font-size);
   line-height: 1.6;
-  font-weight: 400;
-  letter-spacing: 0.01rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 img {
   display: inline-block;
+  vertical-align: middle;
   max-width: 100%;
   min-height: 0;
   height: auto;
-  vertical-align: middle;
+  width: auto;
 }
 
 a {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-link_dark);
   text-decoration: none;
   -webkit-transition: color 0.5s;
   transition: color 0.5s;
-}
-
-a:hover {
-  cursor: pointer;
-  color: #000;
-}
-
-p {
-  margin-top: 0;
-  max-width: 500px;
 }
 
 blockquote,
@@ -66,10 +74,7 @@ h4,
 h5,
 h6 {
   margin: 0 0 2rem 0;
-  color: #000;
   font-family: 'Open Sans', sans-serif;
-  font-weight: 700;
-  text-transform: capitalize;
 }
 
 h1 {
@@ -108,22 +113,13 @@ h6 {
   line-height: 1.4;
 }
 
-h1 a,
-h2 a,
-h3 a,
-h4 a,
-h5 a,
-h6 a {
-  color: #000;
-}
-
+a:hover,
 h1:hover a,
 h2:hover a,
 h3:hover a,
 h4:hover a,
 h5:hover a,
 h6:hover a {
-  display: inline-block;
   color: #fe8c00;
   background: -webkit-linear-gradient(left, #fe8c00, #f83600);
   -webkit-background-clip: text;
@@ -131,27 +127,21 @@ h6:hover a {
 }
 
 @media (min-width: 40rem) {
-  h1 {
-    font-size: 5rem;
+  html {
+    font-size: var(--base-big);
   }
+}
 
-  h2 {
-    font-size: 4.4rem;
-  }
+/* Class Elements */
+.card-wrapper {
+  /* height: 100%; */
+}
 
-  h3 {
-    font-size: 3.6rem;
-  }
+/* Utility */
+.flex {
+  display: flex;
+}
 
-  h4 {
-    font-size: 3.2rem;
-  }
-
-  h5 {
-    font-size: 2.6rem;
-  }
-
-  h6 {
-    font-size: 2rem;
-  }
+.row-wrap {
+  flex-flow: row wrap;
 }
