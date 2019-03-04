@@ -1,5 +1,5 @@
 import { getCards } from './src/services/card.js';
-import { renderCards } from './src/containers/cards/Card.js';
+import { renderCards } from './src/components/cards/Card.js';
 const { render } = lighterhtml;
 
 // dom elements
