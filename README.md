@@ -16,6 +16,25 @@ Using:
 ## Summary
 
 ## Feature Specs
+	- Create a player
+		- CRUD 
+		- User can create an account
+	- Create a leagues
+		- CRUD
+		- User can create a league
+		- Tournaments can be created under leagues
+	- Create a tournament
+		- CRUD
+		- User can create a tournament
+			- Tournaments can be created on their own or as part of a league
+		- Players can be added from a list of registered accounts or they can be manually
+		  added.
+	- Tournament Functionality
+		- User can declare whether tournament is a draft or not
+		
+		- Players can input match scores.
+		- Leaderboard can be viewed at any time.
+
 
 ## User Stories
 	1. User wants to draft with his friends. 
