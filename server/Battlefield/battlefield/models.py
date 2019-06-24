@@ -15,18 +15,18 @@ class Player(db.Model):
 		return f"Player('{self.id}', '{self.name}', '{self.password}')"
 
 
-class League(db.Model):
+class Tournament(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-
+	name = db.Column(db.String(30), nullable=False)
 
 
 class Scoreboard(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	player = db.Column(db.Integer, nullable=False)
-	wins = db.Column(db.Integer, nullable=False)
-	losses = db.Column(db.Integer, nullable=False)
-	draws = db.Column(db.Integer, nullable=False)
-	tiebreak = db.Column(db.Float, nullable=False)
+	wins = db.Column(db.Integer, nullable=False, default=0)
+	losses = db.Column(db.Integer, nullable=False, default=0)
+	draws = db.Column(db.Integer, nullable=False, default=0)
+	tiebreak = db.Column(db.Float, nullable=False, default=0)
 	tournamentId = db.Column(db.Integer, nullable=False)
 
 
