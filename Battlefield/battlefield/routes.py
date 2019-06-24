@@ -87,6 +87,13 @@ def update_player(player_id):
 	else:
 		return "player does not exist"
 
+
+
+@app.route("/player/<player_id>/data", methods=['GET'])
+def player_stats():
+	#PLAYER DATA INFORMATION
+	return "player stat here"
+
 ######################
 #######MATCHES########
 ######################
