@@ -3,16 +3,16 @@ from battlefield import db
 
 class Player(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	first_name = db.Column(db.String(15), nullable=False)
-	last_name = db.Column(db.String(15), nullable=False)
+	name = db.Column(db.String(25), nullable=False)
 	password = db.Column(db.String(60), unique=True, nullable=False)
 	time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	#leagues = db.relationship('League', backref='leagues', lazy=True)
 	#tournaments = db.relationship('Tournament', backref='tournaments', lazy=True)
-	#matches = db.relationship('Game', backref='matches', lazy=True)
+	#matches_won = db.relationship('Match', backref='won', lazy=True, foreign_keys='Match.winner')
+	#matches_lost = db.relationship('Match', backref='lost', lazy=True, foreign_keys='Match.loser')
 
 	def __repr__(self):
-		return f"Player('{self.id}', '{self.first_name}', '{self.last_name}', '{self.password}')"
+		return f"Player('{self.id}', '{self.name}', '{self.password}')"
 
 
 class League(db.Model):
@@ -20,10 +20,22 @@ class League(db.Model):
 
 
 
-class Tournament(db.Model):
+class Scoreboard(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
+	player = db.Column(db.Integer, nullable=False)
+	wins = db.Column(db.Integer, nullable=False)
+	losses = db.Column(db.Integer, nullable=False)
+	draws = db.Column(db.Integer, nullable=False)
+	tiebreak = db.Column(db.Float, nullable=False)
+	tournamentId = db.Column(db.Integer, nullable=False)
 
 
 
-class Game(db.Model):
+class Match(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
+	player1 = db.Column(db.Integer, nullable=False)
+	player2 = db.Column(db.Integer, nullable=False)
+	p1_game_wins = db.Column(db.Integer, nullable=False)
+	p2_game_wins = db.Column(db.Integer, nullable=False)
+	tournamentId = db.Column(db.Integer, nullable=False)
+	time_played = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
