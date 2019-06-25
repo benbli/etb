@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify
 from battlefield import app, db, bcrypt
-from battlefield.models import Player, Match
+from battlefield.models import Player, Match, Tournament, Scoreboard
 
 PLAYER_LIST = []
 
@@ -86,6 +86,77 @@ def update_player(player_id):
 		return jsonify(player_data)
 	else:
 		return "player does not exist"
+
+
+
+######################
+#####TOURNAMENTS######
+######################
+
+@app.route("/tournament", methods=['POST'])
+def post_tournament():
+	data = request.get_json()
+	new_tournament = Tournament(name=data['name'])
+	db.session.add(new_tournament)
+	db.session.commit()
+
+	return ''
+
+
+
+@app.route("/tournament", methods=['GET'])
+def get_all_tournament():
+	tournaments = Tournament.query.all()
+
+	output = []
+	if tournaments:
+		for tournament in tournaments:
+			tournament_data ={}
+			tournament_data['id'] = tournament.id
+			tournament_data['name'] = tournament.name
+			output.append(tournament_data)
+
+		return jsonify({'tournament' : output})
+	else:
+		return "tournament does not exist"
+
+
+
+@app.route("/tournament/<tournament_id>", methods=['GET'])
+def get_tournament(tournament_id):
+	tournament = Tournament.query.get(tournament_id)
+
+	if tournament:
+		tournament_data ={}
+		tournament_data['id'] = tournament.id
+		tournament_data['name'] = tournament.name
+		return jsonify(tournament_data)
+	else:
+		return "tournament does not exist"
+
+
+
+@app.route("/tournament/<tournament_id>", methods=['PUT'])
+def update_tournament(tournament_id):
+	tournament = Tournament.query.get(tournament_id)
+
+	if tournament:
+		data = request.get_json()
+		#Hits an error if only one, the other, or neither are updated
+		if data['name']:
+			tournament.name = data['name']
+		
+		db.session.commit()
+
+		tournament_data ={}
+		tournament_data['id'] = tournament.id
+		tournament_data['name'] = tournament.name
+
+		return jsonify(tournament_data)
+	else:
+		return "tournament does not exist"
+
+
 
 ######################
 #######MATCHES########
