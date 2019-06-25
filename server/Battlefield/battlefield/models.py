@@ -38,4 +38,4 @@ class Match(db.Model):
 	p1_game_wins = db.Column(db.Integer, nullable=False)
 	p2_game_wins = db.Column(db.Integer, nullable=False)
 	tournamentId = db.Column(db.Integer, nullable=False)
-time_played = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+	time_played = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
