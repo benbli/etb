@@ -1,12 +1,14 @@
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, redirect, url_for
 from battlefield import app, db, bcrypt
 from battlefield.models import Player, Match, Tournament, Scoreboard
+from battlefield.forms import RegisterForm
 
-PLAYER_LIST = []
+
 
 @app.route("/")
 def hello():
 	return "hello"
+
 
 
 ######################
@@ -162,7 +164,6 @@ def update_tournament(tournament_id):
 #######MATCHES########
 ######################
 
-#STILL NEEDS TO BE TESTED
 @app.route("/match", methods=['POST'])
 def post_match():
 	data = request.get_json()
@@ -192,3 +193,17 @@ def get_all_matches():
 		return jsonify({'matches' : output})
 	else:
 		return "no matches"
+
+
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+	form = RegisterForm()
+	if form.validate_on_submit():
+		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+		new_player = Player(name=form.username.data, password=hashed_password)
+		db.session.add(new_player)
+		db.session.commit()
+
+		return redirect(url_for('get_all_players'))
+	return render_template('register.html', form=form)
