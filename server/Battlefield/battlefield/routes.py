@@ -1,7 +1,7 @@
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, redirect, url_for
 from battlefield import app, db, bcrypt
 from battlefield.models import Player, Scoreboard, Match, Tournament
-from battlefield.forms import TournamentForm
+from battlefield.forms import TournamentForm, RegisterForm
 
 PLAYER_LIST = []
 
@@ -92,6 +92,71 @@ def update_player(player_id):
 #######Tournament#####
 ######################
 
+@app.route("/tournament", methods=['POST'])
+def post_tournament():
+	data = request.get_json()
+	new_tournament = Tournament(name=data['name'])
+	db.session.add(new_tournament)
+	db.session.commit()
+
+	return ''
+
+
+
+@app.route("/tournament", methods=['GET'])
+def get_all_tournament():
+	tournaments = Tournament.query.all()
+
+	output = []
+	if tournaments:
+		for tournament in tournaments:
+			tournament_data ={}
+			tournament_data['id'] = tournament.id
+			tournament_data['name'] = tournament.name
+			output.append(tournament_data)
+
+		return jsonify({'tournament' : output})
+	else:
+		return "tournament does not exist"
+
+
+
+@app.route("/tournament/<tournament_id>", methods=['GET'])
+def get_tournament(tournament_id):
+	tournament = Tournament.query.get(tournament_id)
+
+	if tournament:
+		tournament_data ={}
+		tournament_data['id'] = tournament.id
+		tournament_data['name'] = tournament.name
+		return jsonify(tournament_data)
+	else:
+		return "tournament does not exist"
+
+
+
+@app.route("/tournament/<tournament_id>", methods=['PUT'])
+def update_tournament(tournament_id):
+	tournament = Tournament.query.get(tournament_id)
+
+	if tournament:
+		data = request.get_json()
+		#Hits an error if only one, the other, or neither are updated
+		if data['name']:
+			tournament.name = data['name']
+		
+		db.session.commit()
+
+		tournament_data ={}
+		tournament_data['id'] = tournament.id
+		tournament_data['name'] = tournament.name
+
+		return jsonify(tournament_data)
+	else:
+		return "tournament does not exist"
+
+
+
 ######################
 #######Socoreboard####
 ######################
@@ -161,7 +226,6 @@ def get_scoreboard(scoreboard_id):
 #######MATCHES########
 ######################
 
-# STILL NEEDS TO BE TESTED
 @app.route("/match", methods=['POST'])
 def post_match():
     data = request.get_json()
@@ -190,6 +254,21 @@ def get_all_matches():
         return jsonify({'matches': output})
     else:
         return "no matches"
+
+
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+	form = RegisterForm()
+	if form.validate_on_submit():
+		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+		new_player = Player(name=form.username.data, password=hashed_password)
+		db.session.add(new_player)
+		db.session.commit()
+
+		return redirect(url_for('get_all_players'))
+	return render_template('register.html', form=form)
+
 
 
 @app.route("/create_tournament", methods=['GET', 'POST'])
