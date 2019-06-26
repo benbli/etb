@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.name.label("tournament name")}}
+            {{ form.name }}
+        </div>
+
+        <div>
+            {{form.submit()}}
+    </form>
+</body>
+</html>
