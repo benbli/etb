@@ -7,10 +7,14 @@
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div>
-            {{ form.name.label("tournament name")}}
+            {{ form.name.label("Tournament Name")}}
             {{ form.name }}
         </div>
 
+        <div>
+            {{ form.numofplayers.label("Numbers of Players")}}
+            {{ form.numofplayers }}
+        </div>
         <div>
             {{form.submit()}}
     </form>

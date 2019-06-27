@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
+from wtforms import StringField, SubmitField, PasswordField, IntegerField
 from wtforms.validators import DataRequired, Length
 
 
@@ -13,4 +13,12 @@ class RegisterForm(FlaskForm):
 
 class TournamentForm(FlaskForm):
     name = StringField('name', validators=[DataRequired(), Length(min=3, max=30)])
-    submit = SubmitField('create')
+    numofplayers = IntegerField('numofplayers', validators=[DataRequired()])
+	submit = SubmitField('Create')
+
+
+
+class StatisticsForm(FlaskForm):
+	user_id = IntegerField('user_id', validators=[])
+	username = StringField('username', validators=[Length(max=20)])
+	submit = SubmitField('Get Stats')

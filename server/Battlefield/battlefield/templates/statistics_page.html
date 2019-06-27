@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<form method="POST" action="">
+		{{ form.hidden_tag() }}
+		<div>
+			{{ form.user_id.label("player ID") }}
+			{{ form.user_id }}
+		</div>
+		<div>
+			{{ form.username.label("username") }}
+			{{ form.username }}
+		</div>
+		{{ form.submit() }}
+	</form>
+</body>
+</html>
