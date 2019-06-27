@@ -3,6 +3,7 @@ from battlefield import app, db, bcrypt
 from battlefield.models import Player, Scoreboard, Match, Tournament
 from battlefield.forms import TournamentForm, RegisterForm, StatisticsForm
 from sqlalchemy import or_
+import random
 
 
 
@@ -39,9 +40,7 @@ def create_tournament():
         random.shuffle(player_list)
 
         return jsonify(player_list)
-
-return render_template('create_tournament.html', form=form)
-
+    return render_template('create_tournament.html', form=form)
 
 
 
