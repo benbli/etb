@@ -4,7 +4,6 @@ from battlefield.models import Player, Scoreboard, Match, Tournament
 from battlefield.forms import TournamentForm, RegisterForm
 
 
-
 @app.route("/")
 def hello():
     return "main page"
@@ -89,69 +88,66 @@ def update_player(player_id):
 #######Tournament#####
 ######################
 
+
 @app.route("/tournament", methods=['POST'])
 def post_tournament():
-	data = request.get_json()
-	new_tournament = Tournament(name=data['name'])
-	db.session.add(new_tournament)
-	db.session.commit()
+    data = request.get_json()
+    new_tournament = Tournament(name=data['name'])
+    db.session.add(new_tournament)
+    db.session.commit()
 
-	return ''
-
+    return ''
 
 
 @app.route("/tournament", methods=['GET'])
 def get_all_tournament():
-	tournaments = Tournament.query.all()
+    tournaments = Tournament.query.all()
 
-	output = []
-	if tournaments:
-		for tournament in tournaments:
-			tournament_data ={}
-			tournament_data['id'] = tournament.id
-			tournament_data['name'] = tournament.name
-			output.append(tournament_data)
+    output = []
+    if tournaments:
+        for tournament in tournaments:
+            tournament_data = {}
+            tournament_data['id'] = tournament.id
+            tournament_data['name'] = tournament.name
+            output.append(tournament_data)
 
-		return jsonify({'tournament' : output})
-	else:
-		return "tournament does not exist"
-
+        return jsonify({'tournament': output})
+    else:
+        return "tournament does not exist"
 
 
 @app.route("/tournament/<tournament_id>", methods=['GET'])
 def get_tournament(tournament_id):
-	tournament = Tournament.query.get(tournament_id)
+    tournament = Tournament.query.get(tournament_id)
 
-	if tournament:
-		tournament_data ={}
-		tournament_data['id'] = tournament.id
-		tournament_data['name'] = tournament.name
-		return jsonify(tournament_data)
-	else:
-		return "tournament does not exist"
-
+    if tournament:
+        tournament_data = {}
+        tournament_data['id'] = tournament.id
+        tournament_data['name'] = tournament.name
+        return jsonify(tournament_data)
+    else:
+        return "tournament does not exist"
 
 
 @app.route("/tournament/<tournament_id>", methods=['PUT'])
 def update_tournament(tournament_id):
-	tournament = Tournament.query.get(tournament_id)
+    tournament = Tournament.query.get(tournament_id)
 
-	if tournament:
-		data = request.get_json()
-		#Hits an error if only one, the other, or neither are updated
-		if data['name']:
-			tournament.name = data['name']
-		
-		db.session.commit()
+    if tournament:
+        data = request.get_json()
+        # Hits an error if only one, the other, or neither are updated
+        if data['name']:
+            tournament.name = data['name']
 
-		tournament_data ={}
-		tournament_data['id'] = tournament.id
-		tournament_data['name'] = tournament.name
+        db.session.commit()
 
-		return jsonify(tournament_data)
-	else:
-		return "tournament does not exist"
+        tournament_data = {}
+        tournament_data['id'] = tournament.id
+        tournament_data['name'] = tournament.name
 
+        return jsonify(tournament_data)
+    else:
+        return "tournament does not exist"
 
 
 ######################
