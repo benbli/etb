@@ -30,26 +30,67 @@ def create_tournament():
         db.session.commit()
 
         players = Player.query.filter(Player.id <= numofplayers)
-        player_list = []
+        player_list = {}
         for player in players:
-            player_list.append(player.name)
+            player_list.update({player.id: player.name})
         session['player_list'] = player_list
-# random.shuffle(player_list)
+        session['tournamentId'] = new_tournament.id
+
         return redirect(url_for('seating'))
-# return jsonify(player_list)
+
     return render_template('create_tournament.html', form=form)
 
 
 @app.route("/seating", methods=['GET', 'POST'])
 def seating():
+
     form = SeatingForm()
     player_list = session.get('player_list')
-    random.shuffle(player_list)
-    # return jsonify(player_list)
-    return render_template('seating.html', player_list=player_list, form=form)
-    # render_template('seating.html'))
+    tournamentId = session.get('tournamentId')
+    #x = random.randint(1, len(player_list))
 
-    # return render_template('seating.html')
+    key_list = []
+    for key in player_list:
+        key_list.append(key)
+
+    random.shuffle(key_list)
+    name_list = []
+    for i in key_list:
+        name_list.append(player_list[i])
+
+        if form.is_submitted():
+
+            matchup_list = []
+            for key in key_list:
+                if key_list.index(key) % 2 == 0:
+                    matchup = []
+                    matchup.append(key_list[key_list.index(key)])
+                    if len(key_list) - key_list.index(key) == 1:
+                        matchup.append(0)
+                    else:
+                        matchup.append(key_list[key_list.index(key) + 1])
+                    matchup_list.append(matchup)
+
+            for matchup in matchup_list:
+                new_match = Match(
+                    player1=matchup[0], player2=matchup[1],
+                    p1_game_wins=0, p2_game_wins=0,
+                    tournamentId=tournamentId
+                )
+                db.session.add(new_match)
+            db.session.commit()
+
+            matchup_list_names = []
+
+            for matchup in matchup_list:
+                matchup_names = []
+                for player in matchup:
+                    matchup_names.append(player_list[player])
+                matchup_list_names.append(matchup_names)
+
+            return jsonify(matchup_list_names)
+
+    return render_template('seating.html', player_list=name_list, form=form)
 
 
 @app.route("/view_stats", methods=['GET', 'POST'])

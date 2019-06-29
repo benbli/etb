@@ -35,6 +35,7 @@ class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player1 = db.Column(db.Integer, nullable=False)
     player2 = db.Column(db.Integer, nullable=False)
+    # ADD A DEFAULT VALUE FOR GAME WINS
     p1_game_wins = db.Column(db.Integer, nullable=False)
     p2_game_wins = db.Column(db.Integer, nullable=False)
     tournamentId = db.Column(db.Integer, nullable=False)
