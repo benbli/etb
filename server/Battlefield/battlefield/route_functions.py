@@ -85,7 +85,10 @@ def seating():
             for matchup in matchup_list:
                 matchup_names = []
                 for player in matchup:
-                    matchup_names.append(player_list[player])
+                    if player != 0:
+                        matchup_names.append(player_list[player])
+                    else:
+                        matchup_names.append('BYE')
                 matchup_list_names.append(matchup_names)
 
             return jsonify(matchup_list_names)
