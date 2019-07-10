@@ -10,8 +10,11 @@
       var player_list={{ player_list }}
     </script>
     {{ player_list }}
-    <div>
-        {{ form.submit() }}
-    </div>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
 </body>
 </html>
