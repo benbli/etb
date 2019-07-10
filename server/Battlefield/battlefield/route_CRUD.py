@@ -162,10 +162,10 @@ def post_scoreboard():
     new_scoreboard = Scoreboard(
 
         # So here player is equivalent to name?
-        player=data['player_name'], wins=data['win'],
-        losses=data['loss'], draws=data['draw'],
+        player=data['player'], wins=data['wins'],
+        losses=data['losses'], draws=data['draws'],
         # tiebreak=tiebreak_scores,
-        tiebreak=data['tiebreakscores'],
+        tiebreak=data['tiebreak'],
         tournamentId=data['tournamentId']
 
     )
@@ -184,11 +184,11 @@ def get_all_scoreboards():
         for scoreboard in scoreboards:
             scoreboard_data = {}
             scoreboard_data['id'] = scoreboard.id
-            scoreboard_data['player_name'] = scoreboard.player
-            scoreboard_data['win'] = scoreboard.wins
-            scoreboard_data['loss'] = scoreboard.losses
-            scoreboard_data['draw'] = scoreboard.draws
-            scoreboard_data['tiebreakscores'] = scoreboard.tiebreak
+            scoreboard_data['player'] = scoreboard.player
+            scoreboard_data['wins'] = scoreboard.wins
+            scoreboard_data['losses'] = scoreboard.losses
+            scoreboard_data['draws'] = scoreboard.draws
+            scoreboard_data['tiebreak'] = scoreboard.tiebreak
             scoreboard_data['tournamentId'] = scoreboard.tournamentId
             output.append(scoreboard_data)
 
