@@ -27,13 +27,16 @@ def create_tournament():
     if form.validate_on_submit():
         new_tournament = Tournament(name=form.name.data)
         db.session.add(new_tournament)
-        db.session.commit()
+        # db.session.commit()
 
         players = Player.query.filter(Player.id <= numofplayers)
-        player_list = {}
+        # player_list = {}
         for player in players:
-            player_list.update({player.id: player.name})
-        session['player_list'] = player_list
+            new_scoreboard = Scoreboard(player=player.id, tournamentId=new_tournament.id)
+            db.session.add(new_scoreboard)
+        db.session.commit()
+        #     player_list.update({player.id: player.name})
+        # session['player_list'] = player_list
         session['tournamentId'] = new_tournament.id
 
         return redirect(url_for('seating'))
@@ -45,53 +48,93 @@ def create_tournament():
 def seating():
 
     form = SeatingForm()
-    player_list = session.get('player_list')
     tournamentId = session.get('tournamentId')
-    #x = random.randint(1, len(player_list))
+    scoreboards = Scoreboard.query.filter(Scoreboard.tournamentId == tournamentId)
 
-    key_list = []
-    for key in player_list:
-        key_list.append(key)
+    scoreboard_dict = {}
+    player_id_list = []
+    max_points = 0
+    for scoreboard in scoreboards:
+        points = (scoreboard.wins * 3) + (scoreboard.draws * 1)
+        scoreboard_dict.update({scoreboard.player: points})
+        player_id_list.append(scoreboard.player)
+        if points > max_points:
+            max_points = points
 
-    random.shuffle(key_list)
+    points_lists = []
+    while max_points >= 0:
+        these_points = []
+        for key, value in scoreboard_dict.items():
+            if value == max_points:
+                these_points.append(key)
+        random.shuffle(these_points)
+        points_lists.append(these_points)
+        max_points -= 1
+
+    points_combined_list = []
+    for this_list in points_lists:
+        for i in this_list:
+            points_combined_list.append(i)
+
+    players = Player.query.filter(Player.id.in_(player_id_list)).all()
+
+    player_dict = {}
+    for player in players:
+        player_dict.update({player.id: player.name})
+
+    # key_list = []
+    # for key in player_dict:
+    #     key_list.append(key)
+
     name_list = []
-    for i in key_list:
-        name_list.append(player_list[i])
+    for i in points_combined_list:
+        name_list.append(player_dict[i])
 
-        if form.is_submitted():
+    # CURRENTLY DOES NOT CHECK for EMPTY NAME or NUMBERS of PLAYERS
+    if form.is_submitted():
 
-            matchup_list = []
-            for key in key_list:
-                if key_list.index(key) % 2 == 0:
-                    matchup = []
-                    matchup.append(key_list[key_list.index(key)])
-                    if len(key_list) - key_list.index(key) == 1:
-                        matchup.append(0)
-                    else:
-                        matchup.append(key_list[key_list.index(key) + 1])
-                    matchup_list.append(matchup)
+        matches = Match.query.filter(tournamentId=tournamentId)
+# POINTS COMBINED LIST CONTAINS PLAYER'S ID form MOST POINTS to LEAST POINTS
+# THIS SECTION WILL MAKE SURE YOU DON'T PLAY with SAME PPL AGAIN
+        for i in range(len(points_combined_list)):
+            for match in matches:
+                if points_combined_list[i] == match.player1:
 
-            for matchup in matchup_list:
-                new_match = Match(
-                    player1=matchup[0], player2=matchup[1],
-                    p1_game_wins=0, p2_game_wins=0,
-                    tournamentId=tournamentId
-                )
-                db.session.add(new_match)
-            db.session.commit()
+                elif points_combined_list[i] == match.player2
 
-            matchup_list_names = []
 
-            for matchup in matchup_list:
-                matchup_names = []
-                for player in matchup:
-                    if player != 0:
-                        matchup_names.append(player_list[player])
-                    else:
-                        matchup_names.append('BYE')
-                matchup_list_names.append(matchup_names)
+        matchup_list = []
+        for key in key_list:
+            if key_list.index(key) % 2 == 0:
+                matchup = []
+                matchup.append(key_list[key_list.index(key)])
+                if len(key_list) - key_list.index(key) == 1:
+                    matchup.append(0)
+                else:
+                    matchup.append(key_list[key_list.index(key) + 1])
+                matchup_list.append(matchup)
 
-            return jsonify(matchup_list_names)
+        for matchup in matchup_list:
+            new_match = Match(
+                player1=matchup[0], player2=matchup[1],
+                p1_game_wins=0, p2_game_wins=0,
+                tournamentId=tournamentId
+            )
+            db.session.add(new_match)
+        db.session.commit()
+
+        matchup_list_names = []
+
+        for matchup in matchup_list:
+            matchup_names = []
+            for player in matchup:
+                if player != 0:
+                    matchup_names.append(player_dict[player])
+                else:
+                    matchup_names.append('BYE')
+            matchup_list_names.append(matchup_names)
+
+        return jsonify(matchup_list_names)
 
     return render_template('seating.html', player_list=name_list, form=form)
 
