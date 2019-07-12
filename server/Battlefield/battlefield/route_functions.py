@@ -48,7 +48,8 @@ def create_tournament():
 def seating():
 
     form = SeatingForm()
-    tournamentId = session.get('tournamentId')
+    # tournamentId = session.get('tournamentId')
+    tournamentId = 200
     scoreboards = Scoreboard.query.filter(Scoreboard.tournamentId == tournamentId)
 
     scoreboard_dict = {}
@@ -92,26 +93,35 @@ def seating():
 
     # CURRENTLY DOES NOT CHECK for EMPTY NAME or NUMBERS of PLAYERS
     if form.is_submitted():
-
-        matches = Match.query.filter(tournamentId=tournamentId)
-# POINTS COMBINED LIST CONTAINS PLAYER'S ID form MOST POINTS to LEAST POINTS
-# THIS SECTION WILL MAKE SURE YOU DON'T PLAY with SAME PPL AGAIN
+        matches = Match.query.filter(Match.tournamentId == tournamentId)
+    # IF THE LAST PAIR IS A CONFLICT BUT EVERY OTHER PIARS IS OKAY THIS ALGORITHM WON'T WORK. WE'll ALSO HIT AN ERROR
         for i in range(len(points_combined_list)):
-            for match in matches:
-                if points_combined_list[i] == match.player1:
+            if (i % 2 == 0) and (len(points_combined_list) - 1 > i):
+                counter = 2
+                for match in matches:
+                    if points_combined_list[i] == match.player1:
+                        if points_combined_list[i + 1] == match.player2:
+                            temp_player = points_combined_list[i + 1]
+                            points_combined_list[i + 1] = points_combined_list[i + counter]
+                            points_combined_list[i + counter] = temp_player
+                            counter += 1
 
-                elif points_combined_list[i] == match.player2
-
+                    elif points_combined_list[i] == match.player2:
+                        if points_combined_list[i + 1] == match.player1:
+                            temp_player = points_combined_list[i + 1]
+                            points_combined_list[i + 1] = points_combined_list[i + counter]
+                            points_combined_list[i + counter] = temp_player
+                            counter += 1
 
         matchup_list = []
-        for key in key_list:
-            if key_list.index(key) % 2 == 0:
+        for player in points_combined_list:
+            if points_combined_list.index(player) % 2 == 0:
                 matchup = []
-                matchup.append(key_list[key_list.index(key)])
-                if len(key_list) - key_list.index(key) == 1:
+                matchup.append(points_combined_list[points_combined_list.index(player)])
+                if len(points_combined_list) - points_combined_list.index(player) == 1:
                     matchup.append(0)
                 else:
-                    matchup.append(key_list[key_list.index(key) + 1])
+                    matchup.append(points_combined_list[points_combined_list.index(player) + 1])
                 matchup_list.append(matchup)
 
         for matchup in matchup_list:
@@ -120,8 +130,8 @@ def seating():
                 p1_game_wins=0, p2_game_wins=0,
                 tournamentId=tournamentId
             )
-            db.session.add(new_match)
-        db.session.commit()
+        #     db.session.add(new_match)
+        # db.session.commit()
 
         matchup_list_names = []
 

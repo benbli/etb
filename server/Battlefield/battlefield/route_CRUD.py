@@ -159,16 +159,7 @@ def update_tournament(tournament_id):
 def post_scoreboard():
     data = request.get_json()
     # tiebreak_scores =  !!!!!!!!!NEED TO COME UP WITH THE FORMULA LATER!!!!!!!!!
-    new_scoreboard = Scoreboard(
-
-        # So here player is equivalent to name?
-        player=data['player'], wins=data['wins'],
-        losses=data['losses'], draws=data['draws'],
-        # tiebreak=tiebreak_scores,
-        tiebreak=data['tiebreak'],
-        tournamentId=data['tournamentId']
-
-    )
+    new_scoreboard = Scoreboard(player=data['player'], wins=data['wins'], losses=data['losses'], draws=data['draws'], tiebreak=data['tiebreak'], tournamentId=data['tournamentId'])
 
     db.session.add(new_scoreboard)
     db.session.commit()
