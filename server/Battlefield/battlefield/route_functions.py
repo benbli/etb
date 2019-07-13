@@ -107,7 +107,7 @@ def seating():
         matches = Match.query.filter(Match.tournamentId == tournamentId)
 
         matchup_list = []       # A LIST OF LISTS, WHERE EACH SUBLIST CONTAINS THE PLAYERS THAT WOULD BE PAIRED UP.
-        matchup_list_names = [] # A LIST OF PLAYER NAME FOR EACH MATCHUP. FOR FRONT END PURPOSES.
+        matchup_list_names = []  # A LIST OF PLAYER NAME FOR EACH MATCHUP. FOR FRONT END PURPOSES.
 
     # IF THE LAST PAIR IS A CONFLICT BUT EVERY OTHER PIARS IS OKAY THIS ALGORITHM WON'T WORK. WE'll ALSO HIT AN ERROR
     # COMMENT BELOW ALGORITHM SINCE ABOVEMENTIONED ISSUE. WILL FIX THIS LATER ON.
@@ -128,7 +128,6 @@ def seating():
         #                     points_combined_list[i + 1] = points_combined_list[i + counter]
         #                     points_combined_list[i + counter] = temp_player
         #                     counter += 1
-
 
         # POPULATES matchup_list by using points_combined_list. WHEN NUMBERS OF PLAYERS IS ODD, THE LAST PLAYER WILL PAIR WITH PLAYER ID 0 WHO DOESN'T EXIST IN THE DB, EFFECTIVELY GIVING THE LAST PLAYER A BYE.
         for player in points_combined_list:
@@ -221,3 +220,49 @@ def view_stats():
             return 'no such player'
 
     return render_template('statistics_page.html', form=form)
+
+
+@app.route("/standings/<tournament_id>", methods=['GET'])
+def standings(tournament_id):
+    tournament = Tournament.query.get(tournament_id)
+    scoreboards = Scoreboard.query.filter(Scoreboard.tournamentId == tournament_id)
+
+    player_points_dict = {}
+    for scoreboard in scoreboards:
+        points = (scoreboard.wins * 3) + (scoreboard.draws * 1)
+        player_points_dict.update({scoreboard.player: [points, scoreboard.tiebreak]})
+
+    max_points = 0
+    players_points_list = []
+
+    for key in player_points_dict:
+        player_points = player_points_dict[key][0]
+        if max_points < player_points:
+            max_points = player_points
+
+    temp_max_points = max_points
+    while temp_max_points >= 0:
+        points_group = []
+        for key in player_points_dict:
+            player_points = player_points_dict[key]
+            if player_points == temp_max_points:
+                points_group.append(key)
+
+        no_swap = False
+        while no_swap == False:
+            no_swap = True
+            for player in points_group:
+                i = points_group.index(player)
+                if i < len(points_group) - 1:
+                    if points_group[i][1] < points_group[i + 1][1]:
+                        temp_points_group[i] = points_group[i]
+                        points_group[i] = points_group[i + 1]
+                        points_group[i + 1] = temp_points_group[i]
+                        no_swap = False
+        player_points_list.append(points_group)
+        # NEED TO CONVERT player_points_list, FROM LIST OF LISTS INTO A LIST OF INDIVIDUAL "PLAYER ID"
+
+        temp_max_points -= 1
+
+    return '123'
+    # players_points_list.append(points_group)
