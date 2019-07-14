@@ -210,6 +210,8 @@ def get_scoreboard(scoreboard_id):
 #######MATCHES########
 ######################
 
+# TODO: Change /match to /matches to better follow REST principles
+
 @app.route("/match", methods=['POST'])
 def post_match():
     data = request.get_json()
