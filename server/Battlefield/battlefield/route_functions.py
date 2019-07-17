@@ -10,7 +10,8 @@ import random
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(
+            form.password.data).decode('utf-8')
         new_player = Player(name=form.username.data, password=hashed_password)
         db.session.add(new_player)
         db.session.commit()
@@ -21,19 +22,21 @@ def register():
 
 @app.route("/create_tournament", methods=['GET', 'POST'])
 def create_tournament():
+
     form = TournamentForm()
-    numofplayers = form.numofplayers.data
+    dbplayers = Player.query.all()
+    playerIds = request.form.getlist('checked')
 
     # WHEN SUBMITTED, ADDS NEW ENTRY TO TOURNAMENTS DB
     # ADDS NEW ENTRY TO SCOREBORAD DB PER PLAYER
     if form.validate_on_submit():
         new_tournament = Tournament(name=form.name.data)
         db.session.add(new_tournament)
+        players = Player.query.filter(Player.id.in_(playerIds)).all()
 
-        # LINE BELOW PULLS THE FIRST X PLAYERS, WHERE X EQUALS TO THE NUMBERS OF PLAYERS ENTERED. NEEDS TO BE FIXED.
-        players = Player.query.filter(Player.id <= numofplayers)
         for player in players:
-            new_scoreboard = Scoreboard(player=player.id, tournamentId=new_tournament.id)
+            new_scoreboard = Scoreboard(
+                player=player.id, tournamentId=new_tournament.id)
             db.session.add(new_scoreboard)
         db.session.commit()
 
@@ -42,7 +45,7 @@ def create_tournament():
 
         return redirect(url_for('seating'))
 
-    return render_template('create_tournament.html', form=form)
+    return render_template('create_tournament.html', form=form, dbplayers=dbplayers)
 
 
 @app.route("/seating", methods=['GET', 'POST'])
@@ -59,12 +62,17 @@ def seating():
     scoreboard_dict = {}       # DICT KEY: PLAYER ID; VALUE: POINTS
     player_id_list = []        # LIST OF PLAYER IDs
     max_points = 0             # GREATEST POINTS VALUE AMONG PLAYERS
-    points_lists = []          # LIST OF LISTS, WHERE EACH SUBLIST CONTAINS ALL PLAYERS OF A CERTAIN POINT VALUE. SOME SUBLISTS MIGHT BE EMPTY.
-    points_combined_list = []  # A SINGLE LIST OF ALL THE ELEMENTS FROM SUBLISTS IN points_lists. MAINTAINS ORDER BY POINT VALUE. NOTE THAT THIS IS A LIST OF PLAYER IDs, NOT A LIST OF LISTS.
-    player_dict = {}           # DICT KEY: PLAYER ID; VALUE: PLAYER NAME. THIS IS FOR FRONT END PURPOSES
+    # LIST OF LISTS, WHERE EACH SUBLIST CONTAINS ALL PLAYERS OF A CERTAIN POINT VALUE. SOME SUBLISTS MIGHT BE EMPTY.
+    points_lists = []
+    # A SINGLE LIST OF ALL THE ELEMENTS FROM SUBLISTS IN points_lists. MAINTAINS ORDER BY POINT VALUE. NOTE THAT THIS IS A LIST OF PLAYER IDs, NOT A LIST OF LISTS.
+    points_combined_list = []
+    # DICT KEY: PLAYER ID; VALUE: PLAYER NAME. THIS IS FOR FRONT END PURPOSES
+    player_dict = {}
     name_list = []             # LIST OF PLAYER NAMES. THIS IS FOR FRONT END PURPOSES
 
-    scoreboards = Scoreboard.query.filter(Scoreboard.tournamentId == tournamentId)  # PULLS THE SCOREBORADS BY TOURNAMENT ID
+    # PULLS THE SCOREBORADS BY TOURNAMENT ID
+    scoreboards = Scoreboard.query.filter(
+        Scoreboard.tournamentId == tournamentId)
 
     # GRAB SCOREBOARD OF EACH PARTICIPANT IN TOURNAMENT AND CALCULATE THEIR POINTS
     # player_id_list POPULATED (UNSORTED)
@@ -76,7 +84,8 @@ def seating():
         if points > max_points:
             max_points = points
 
-    players = Player.query.filter(Player.id.in_(player_id_list)).all()             # PULLS PLAYERS THAT ONLY IN player_id_list
+    # PULLS PLAYERS THAT ONLY IN player_id_list
+    players = Player.query.filter(Player.id.in_(player_id_list)).all()
 
     # GENERATE LISTS, WHERE EACH LIST CONTAINS ALL PLAYERS WITH A SPECIFIC POINT VALUE. EACH LIST IS SHUFFLED THEN APPENDED TO points_lists
     temp_max_points = max_points
@@ -106,8 +115,10 @@ def seating():
     if form.is_submitted():
         matches = Match.query.filter(Match.tournamentId == tournamentId)
 
-        matchup_list = []       # A LIST OF LISTS, WHERE EACH SUBLIST CONTAINS THE PLAYERS THAT WOULD BE PAIRED UP.
-        matchup_list_names = []  # A LIST OF PLAYER NAME FOR EACH MATCHUP. FOR FRONT END PURPOSES.
+        # A LIST OF LISTS, WHERE EACH SUBLIST CONTAINS THE PLAYERS THAT WOULD BE PAIRED UP.
+        matchup_list = []
+        # A LIST OF PLAYER NAME FOR EACH MATCHUP. FOR FRONT END PURPOSES.
+        matchup_list_names = []
 
     # IF THE LAST PAIR IS A CONFLICT BUT EVERY OTHER PIARS IS OKAY THIS ALGORITHM WON'T WORK. WE'll ALSO HIT AN ERROR
     # COMMENT BELOW ALGORITHM SINCE ABOVEMENTIONED ISSUE. WILL FIX THIS LATER ON.
@@ -133,11 +144,13 @@ def seating():
         for player in points_combined_list:
             if points_combined_list.index(player) % 2 == 0:
                 matchup = []
-                matchup.append(points_combined_list[points_combined_list.index(player)])
+                matchup.append(
+                    points_combined_list[points_combined_list.index(player)])
                 if len(points_combined_list) - points_combined_list.index(player) == 1:
                     matchup.append(0)
                 else:
-                    matchup.append(points_combined_list[points_combined_list.index(player) + 1])
+                    matchup.append(
+                        points_combined_list[points_combined_list.index(player) + 1])
                 matchup_list.append(matchup)
 
         # COMMIT MATCH ENTRIES TO DB
@@ -176,11 +189,13 @@ def view_stats():
             player = Player.query.get(form.user_id.data)
             player_id = player.id
         elif form.username.data:
-            player = Player.query.filter(Player.name == form.username.data).first()
+            player = Player.query.filter(
+                Player.name == form.username.data).first()
             player_id = player.id
 
         if player_id:
-            matches = Match.query.filter(or_(Match.player1 == player_id, Match.player2 == player_id))
+            matches = Match.query.filter(
+                or_(Match.player1 == player_id, Match.player2 == player_id))
             player_total_matches = 0
             player_match_wins = 0
             player_match_draws = 0
@@ -210,8 +225,10 @@ def view_stats():
                 player_data['match_win_rate'] = player_match_wins /\
                     (player_total_matches - player_match_draws)
                 player_data['game_wins'] = player_game_wins
-                player_data['game_losses'] = player_total_games - player_game_wins
-                player_data['game_win_rate'] = player_game_wins / player_total_games
+                player_data['game_losses'] = player_total_games - \
+                    player_game_wins
+                player_data['game_win_rate'] = player_game_wins / \
+                    player_total_games
             else:
                 return 'no matches'
 
@@ -225,12 +242,14 @@ def view_stats():
 @app.route("/standings/<tournament_id>", methods=['GET'])
 def standings(tournament_id):
     tournament = Tournament.query.get(tournament_id)
-    scoreboards = Scoreboard.query.filter(Scoreboard.tournamentId == tournament_id)
+    scoreboards = Scoreboard.query.filter(
+        Scoreboard.tournamentId == tournament_id)
 
     player_points_dict = {}
     for scoreboard in scoreboards:
         points = (scoreboard.wins * 3) + (scoreboard.draws * 1)
-        player_points_dict.update({scoreboard.player: [points, scoreboard.tiebreak]})
+        player_points_dict.update(
+            {scoreboard.player: [points, scoreboard.tiebreak]})
 
     max_points = 0
     players_points_list = []

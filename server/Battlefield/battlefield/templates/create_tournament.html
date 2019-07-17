@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title></title>
-</head>
-<body>
+  </head>
+  <body>
     <form method="POST" action="">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.name.label("Tournament Name")}}
-            {{ form.name }}
-        </div>
-
-        <div>
-            {{ form.numofplayers.label("Numbers of Players")}}
-            {{ form.numofplayers }}
-        </div>
-        <div>
-            {{form.submit()}}
+      {{ form.hidden_tag() }}
+      <div>
+        {{ form.name.label('Tournament Name') }}
+        {{ form.name }}
+      </div>
+      {% for player in dbplayers %}
+      <input type="checkbox" name="checked" value="{{ player.id }}" />{{
+        player.name
+      }}<br />
+      {% endfor %}
+      <div>
+        {{ form.submit() }}
+      </div>
     </form>
-</body>
+  </body>
 </html>

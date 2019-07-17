@@ -11,7 +11,6 @@ class RegisterForm(FlaskForm):
 
 class TournamentForm(FlaskForm):
     name = StringField('name', validators=[DataRequired(), Length(min=3, max=30)])
-    numofplayers = IntegerField('numofplayers', validators=[DataRequired()])
     submit = SubmitField('Create')
 
 
