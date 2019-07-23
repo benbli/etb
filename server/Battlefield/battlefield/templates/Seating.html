@@ -6,10 +6,12 @@
 </html>
 
 <body>
-    <script>
-      var player_list={{ player_list }}
-    </script>
+    {% if round_number %}
+    Round: {{ round_number }}
+    {% endif %}
+    <div>
     {{ player_list }}
+    </div>
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div>

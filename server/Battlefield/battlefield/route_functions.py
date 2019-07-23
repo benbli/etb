@@ -113,6 +113,7 @@ def seating():
 
     # CURRENTLY DOES NOT CHECK for EMPTY NAME or NUMBERS of PLAYERS
     if form.is_submitted():
+        round_number = request.form.get()
         matches = Match.query.filter(Match.tournamentId == tournamentId)
 
         # A LIST OF LISTS, WHERE EACH SUBLIST CONTAINS THE PLAYERS THAT WOULD BE PAIRED UP.
@@ -173,7 +174,7 @@ def seating():
                     matchup_names.append('BYE')
             matchup_list_names.append(matchup_names)
 
-        return jsonify(matchup_list_names)
+        return render_template('seating.html', player_list = matchup_list_names, round_number = round_number, form=form)
 
     return render_template('seating.html', player_list=name_list, form=form)
 
