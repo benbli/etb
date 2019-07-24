@@ -6,12 +6,23 @@
 </html>
 
 <body>
+    <h1>seating order</h1>
+        {{ player_list }}
     {% if round_number %}
-    Round: {{ round_number }}
+        <h2>Round: {{ round_number }}</h2>
+        <div>
+            
+        </div>
+        {% for pair in player_list %}
+            {% for player in pair %}
+                <div>
+                    <span>{{player}}</span>
+                    <input type="text" data-player="{{player}}" placeholder="wins">
+                </div>
+            {% endfor %}
+        {% endfor %}
     {% endif %}
-    <div>
-    {{ player_list }}
-    </div>
+    
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div>
