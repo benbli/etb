@@ -42,7 +42,7 @@ def create_tournament():
 
         # NOT CERTAIN IF SESSION IS SECURE
         session['tournamentId'] = new_tournament.id
-
+        session['roundNumber'] = -1
         return redirect(url_for('seating'))
 
     return render_template('create_tournament.html', form=form, dbplayers=dbplayers)
@@ -54,6 +54,7 @@ def seating():
     form = SeatingForm()
     # BELOW THE CHANGE OF THE TOURNAMENT ID IS JUST FOR TESTING PURPOSES
     tournamentId = session.get('tournamentId')
+    session['roundNumber'] += 1
     # tournamentId = 200
 
     ##################################################
@@ -113,7 +114,8 @@ def seating():
 
     # CURRENTLY DOES NOT CHECK for EMPTY NAME or NUMBERS of PLAYERS
     if form.is_submitted():
-        round_number = request.form.get()
+        # round_number = request.form.get()
+        round_number = session['roundNumber']
         matches = Match.query.filter(Match.tournamentId == tournamentId)
 
         # A LIST OF LISTS, WHERE EACH SUBLIST CONTAINS THE PLAYERS THAT WOULD BE PAIRED UP.
@@ -174,7 +176,7 @@ def seating():
                     matchup_names.append('BYE')
             matchup_list_names.append(matchup_names)
 
-        return render_template('seating.html', player_list = matchup_list_names, round_number = round_number, form=form)
+        return render_template('seating.html', player_list=matchup_list_names, round_number=round_number, form=form)
 
     return render_template('seating.html', player_list=name_list, form=form)
 
