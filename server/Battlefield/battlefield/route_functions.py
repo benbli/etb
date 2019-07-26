@@ -75,8 +75,7 @@ def seating():
         player_name_list.append(player.name)
 
     if form.is_submitted():
-        return "got there"
-        # return redirect(url_for('rounds'))
+        return redirect(url_for('rounds'))
 
     return render_template('seating.html', player_list=player_name_list, form=form)
 
@@ -91,10 +90,12 @@ def rounds():
     scoreboard_dict = {}       # DICT KEY: PLAYER ID; VALUE: POINTS
     player_id_list = []        # LIST OF PLAYER IDs
     max_points = 0             # GREATEST POINTS VALUE AMONG PLAYERS
-    # LIST OF LISTS, WHERE EACH SUBLIST CONTAINS ALL PLAYERS OF A CERTAIN POINT VALUE. SOME SUBLISTS MIGHT BE EMPTY.
-    points_lists = []
-    # A SINGLE LIST OF ALL THE ELEMENTS FROM SUBLISTS IN points_lists. MAINTAINS ORDER BY POINT VALUE. NOTE THAT THIS IS A LIST OF PLAYER IDs, NOT A LIST OF LISTS.
-    points_combined_list = []
+    # LIST OF PLAYER IDS ORDERED BY POINT VALUE
+    points_list = []
+
+    tournamentId = session.get('tournamentId')
+    session['roundNumber'] += 1
+    round_number = session['roundNumber']
 
 
     # PULLS THE SCOREBORADS BY TOURNAMENT ID
@@ -115,6 +116,7 @@ def rounds():
     players = Player.query.filter(Player.id.in_(player_id_list)).all()
 
     # GENERATE LISTS, WHERE EACH LIST CONTAINS ALL PLAYERS WITH A SPECIFIC POINT VALUE. EACH LIST IS SHUFFLED THEN APPENDED TO points_lists
+    #points_lists is populated.
     temp_max_points = max_points
     while temp_max_points >= 0:
         these_points = []
@@ -122,36 +124,24 @@ def rounds():
             if value == temp_max_points:
                 these_points.append(key)
         random.shuffle(these_points)
-        points_lists.append(these_points)
+        for player in these_points:
+            points_list.append(player)
         temp_max_points -= 1
 
-    # POPULATES points_combined_list USING points_lists
-    for this_list in points_lists:
-        for i in this_list:
-            points_combined_list.append(i)
-
-
-
-    tournamentId = session.get('tournamentId')
-    session['roundNumber'] += 1
-    round_number = session['roundNumber']
     matches = Match.query.filter(Match.tournamentId == tournamentId)
 
     # A LIST OF LISTS, WHERE EACH SUBLIST CONTAINS THE PLAYERS THAT WOULD BE PAIRED UP.
     matchup_list = []
-    # A LIST OF PLAYER NAME FOR EACH MATCHUP. FOR FRONT END PURPOSES.
-    matchup_list_names = []
 
-    for player in points_combined_list:
-        if points_combined_list.index(player) % 2 == 0:
+    for player in points_list:
+        if points_list.index(player) % 2 == 0:
             matchup = []
-            matchup.append(
-                points_combined_list[points_combined_list.index(player)])
-            if len(points_combined_list) - points_combined_list.index(player) == 1:
+            matchup.append(player)
+            if len(points_list) - points_list.index(player) == 1:
                 matchup.append(0)
             else:
                 matchup.append(
-                    points_combined_list[points_combined_list.index(player) + 1])
+                    points_list[points_list.index(player) + 1])
             matchup_list.append(matchup)
 
     # COMMIT MATCH ENTRIES TO DB
@@ -164,15 +154,9 @@ def rounds():
         db.session.add(new_match)
     db.session.commit()
 
-    # POPULATES matchup_list_names by matchup_names
-    for matchup in matchup_list:
-        matchup_names = []
-        for player in matchup:
-            if player != 0:
-                matchup_names.append(player_dict[player])
-            else:
-                matchup_names.append('BYE')
-        matchup_list_names.append(matchup_names)
+    return render_template('round.html', player_list=player_name_list, form=form)
+
+
 
 @app.route("/view_stats", methods=['GET', 'POST'])
 def view_stats():
