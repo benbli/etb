@@ -96,6 +96,9 @@ def rounds():
     tournamentId = session.get('tournamentId')
     session['roundNumber'] += 1
     round_number = session['roundNumber']
+    form = SeatingForm()
+    wins_list = request.form.getlist('each_wins')
+    print (wins_list)
 
 
     # PULLS THE SCOREBORADS BY TOURNAMENT ID
@@ -154,7 +157,18 @@ def rounds():
         db.session.add(new_match)
     db.session.commit()
 
-    return render_template('round.html', player_list=player_name_list, form=form)
+    #FOR FRONT END PURPOSES
+    matchup_list_names = []
+    for matchup in matchup_list:
+        temp_match = []
+        for contender in matchup:
+            for player in players:
+                if player.id == contender:
+                    temp_match.append(player.name)
+        matchup_list_names.append(temp_match)
+
+
+    return render_template('rounds.html', player_list=matchup_list, round_number=round_number, form=form)
 
 
 

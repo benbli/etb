@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+</html>
+
+<body>
+        <h2>Round: {{ round_number }}</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        {% for pair in player_list %}
+            {% for player in pair %}
+                <div>
+                    <span>{{player}}</span>
+                    <input type="text" name="each_wins" placeholder="wins">
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+</body>
+</html>
